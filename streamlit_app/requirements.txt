@@ -1,4 +1,4 @@
-mariadb
+#mariadb
 numpy==2.1.2
 opencv_contrib_python==4.10.0.84
 opencv_python==4.10.0.84
@@ -10,5 +10,5 @@ pytz==2024.2
 streamlit==1.38.0
 streamlit_drawable_canvas==0.9.3
 transformers==4.44.2
-mariadb-connector-c==3.3.11
+#mariadb-connector-c==3.3.11
 SQLAlchemy
