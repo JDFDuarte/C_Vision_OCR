@@ -1,29 +1,25 @@
 import pandas as pd
-import mariadb
+import numpy as np
+
 import streamlit as st
 import streamlit.components.v1 as components
 from streamlit_drawable_canvas import st_canvas
-import plotly.express as px
+
 from datetime import datetime
-import pytz
-from PIL import ImageDraw
-import numpy as np
-import json
+
+
+from PIL import Image, ImageDraw
 import base64
-from PIL import Image
 import io
 import os
-from io import StringIO
 
 from sidebar_utils import display_calendar_in_sidebar
-
 from operator import add, sub, mul, truediv
 
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, LargeBinary
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import pytz
+import mariadb
 import cv2
 
 import re

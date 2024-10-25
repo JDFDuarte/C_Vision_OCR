@@ -1,0 +1,13 @@
+mariadb==1.1.10
+numpy==2.1.2
+opencv_contrib_python==4.10.0.84
+opencv_python==4.10.0.84
+opencv_python_headless==4.10.0.84
+pandas==2.2.3
+Pillow==11.0.0
+PyMySQL==1.1.1
+pytz==2024.2
+pytz==2024.1
+streamlit==1.38.0
+streamlit_drawable_canvas==0.9.3
+transformers==4.44.2
