@@ -1,4 +1,4 @@
-mariadb==1.1.10
+mariadb
 numpy==2.1.2
 opencv_contrib_python==4.10.0.84
 opencv_python==4.10.0.84
