@@ -256,11 +256,7 @@ def save_error_report(original_text, corrected_text, image, connection):
 
     try:
         # Attempt to ping the connection to ensure it's active
-        try:
-            connection.ping()
-        except mariadb.OperationalError:
-            st.error("Database connection lost. Please try reconnecting.")
-            return
+        connection.ping(reconnect=True)
 
         # Create a cursor object to execute SQL queries
         cursor = connection.cursor()
@@ -279,7 +275,7 @@ def save_error_report(original_text, corrected_text, image, connection):
 
         st.success("Thank you for your feedback! We've recorded the error.")
     
-    except mariadb.Error as e:
+    except pymysql.Error as e:
         # Rollback the transaction in case of an error
         connection.rollback()
         st.error(f"Failed to save error report: {e}")
