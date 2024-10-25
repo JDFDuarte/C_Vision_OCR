@@ -44,10 +44,7 @@ def get_base64_of_bin_file(bin_file):
 
 #background_image = "images/background.jpg"
 #encoded_image = get_base64_of_bin_file(background_image)
-canvas_back = "canvas_back_text.png"
-gradient_image = Image.open(canvas_back)
-icon_canvas = "icon.png"
-icon_use = Image.open(icon_canvas)
+
 
 st.markdown("""
         <style>
