@@ -75,7 +75,7 @@ display_calendar_in_sidebar()
 #_______ DB Setup _______ #
 conn = st.connection("gsheets", type=GSheetsConnection)
 #df = conn.read()
-error_report_sheet = conn.read(worksheet="error_report")
+#error_report_sheet = conn.read(worksheet="error_report")
 
 
 
