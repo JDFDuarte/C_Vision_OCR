@@ -19,12 +19,11 @@ from operator import add, sub, mul, truediv
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 
 import pytz
-#import mariadb
 import cv2
 
 import re
 
-import pymysql
+
 
 
 #_______ Page Setup _______ #

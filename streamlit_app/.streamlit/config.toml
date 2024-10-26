@@ -3,3 +3,34 @@ base="light"
 primaryColor="#4a829e"
 secondaryBackgroundColor="#d2d4d8"
 textColor="#2f3973"
+
+
+[server]
+enableCORS = false
+enableXsrfProtection = false
+
+[browser]
+serverAddress = "0.0.0.0"
+serverPort = 8501
+
+[runner]
+magicEnabled = true
+installTracer = true
+
+[theme]
+base = "light"
+
+[logger]
+level = "info"
+
+[client]
+toolbarMode = "minimal"
+
+[global]
+developmentMode = false
+
+[server.fileWatcherType]
+type = "none"
+
+[runner.installDependencies]
+apt = ["libgl1-mesa-glx"]
