@@ -4,7 +4,7 @@ import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 from streamlit_drawable_canvas import st_canvas
-
+from streamlit_gsheets import GSheetsConnection
 from datetime import datetime
 
 
@@ -74,59 +74,29 @@ display_calendar_in_sidebar()
 
 
 #_______ DB Setup _______ #
-db_creds = st.secrets["database"]
-
-connection = pymysql.connect(
-    user=db_creds["username"],
-    password=db_creds["password"],
-    host=db_creds["host"],
-    database=db_creds["database"]
-)
-
-cursor = connection.cursor()
-
-
-def display_tables():
-    cursor = connection.cursor()
-    cursor.execute("SHOW TABLES")
-    tables = [table[0] for table in cursor.fetchall()]
-    
-    df_dict = {} # Dictionary to store DataFrames
-
-    for table in tables:
-        df = pd.read_sql(f"SELECT * FROM {table}", connection)
-        df_dict[f'df_{table}'] = df # Store DataFrame in dictionary
-    
-    return df_dict
-
-
-def save_to_db(table_name, date, column_name, new_value):
-    sql = f"INSERT INTO {table_name} (date, {column_name}) VALUES (?, ?)"
-    cursor.execute(sql, (date, new_value))
-    connection.commit()
-
-
-df_dict = display_tables()
+conn = st.connection("gsheets", type=GSheetsConnection)
+df = conn.read()
+error_report_sheet = conn.read(worksheet="error_report")
 
 
 
-# _______ Functions _______ #
+#_______ Functions _______ #
+model, processor = None, None
 
-@st.cache_resource
-
-# # Loads the model without using a locally saved file
-# def load_model():
-#     with st.spinner("Loading model... This may take a few minutes."):
-#         processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-stage1")
-#         model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-stage1")
-#     return processor, model
-
-# Loads the model from a locally saved file
+@st.cache_data
+# Loads the model without using a locally saved file
 def load_model():
     with st.spinner("Loading model... This may take a few minutes."):
-        processor = TrOCRProcessor.from_pretrained(save_directory)
-        model = VisionEncoderDecoderModel.from_pretrained(save_directory)
+        processor = TrOCRProcessor.from_pretrained("microsoft/trocr-large-stage1")
+        model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-large-stage1")
     return processor, model
+
+# Loads the model from a locally saved file
+# def load_model():
+#     with st.spinner("Loading model... This may take a few minutes."):
+#         processor = TrOCRProcessor.from_pretrained(save_directory)
+#         model = VisionEncoderDecoderModel.from_pretrained(save_directory)
+#     return processor, model
 
 
 # Processes the image and creates the bounding boxes around each character
@@ -180,13 +150,14 @@ def evaluate_equation(equation):
     equation = equation.replace(' ', '').replace('x', '*').replace('X', '*')
     
     def parse_expression(expression):
-        tokens = re.findall(r'\d+|\+|\-|\*|\/|\(|\)', expression)
+        # Updated regex to recognize decimal numbers as well as integers
+        tokens = re.findall(r'\d*\.\d+|\d+|\+|\-|\*|\/|\(|\)', expression)
         output_queue = []
         operator_stack = []
         precedence = {'+': 1, '-': 1, '*': 2, '/': 2}
         
         for token in tokens:
-            if token.isdigit():
+            if re.match(r'\d*\.\d+|\d+', token):  # Check if token is a number
                 output_queue.append(float(token))
             elif token in precedence:
                 while (operator_stack and operator_stack[-1] != '(' and
@@ -241,46 +212,30 @@ def evaluate_equation(equation):
     
 
 
-def save_error_report(original_text, corrected_text, image, connection):
-    # Convert image to bytes
-    img_byte_arr = io.BytesIO()
-    image.save(img_byte_arr, format='PNG')
-    img_byte_arr = img_byte_arr.getvalue()
-
+def save_error_report(original_text, corrected_text, conn):
     # Create a timestamp
-    timestamp = datetime.now()
-    cursor = None  # Initialize cursor to None
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
-        # Attempt to ping the connection to ensure it's active
-        connection.ping(reconnect=True)
+        # Read the existing data from the error_report worksheet
+        error_report_df = conn.read(worksheet="error_report")
 
-        # Create a cursor object to execute SQL queries
-        cursor = connection.cursor()
+        # Create a new row
+        new_row = pd.DataFrame([{
+            "timestamp": timestamp,
+            "original_text": original_text,
+            "corrected_text": corrected_text
+        }])
 
-        # SQL query to insert data into the table, using %s as placeholders
-        sql = """
-        INSERT INTO error_report (timestamp, original_text, corrected_text, image)
-        VALUES (%s, %s, %s, %s)
-        """
-        
-        # Execute the query with the data
-        cursor.execute(sql, (timestamp, original_text, corrected_text, img_byte_arr))
-        
-        # Commit the transaction
-        connection.commit()
+        # Append the new row to the existing DataFrame
+        updated_error_report_df = pd.concat([error_report_df, new_row], ignore_index=True)
+        #st.dataframe(updated_error_report_df)
+        # Write the updated DataFrame back to the Google Sheets worksheet
+        conn.update(worksheet="error_report", data=updated_error_report_df)
 
-        st.success("Thank you for your feedback! We've recorded the error.")
-    
-    except pymysql.Error as e:
-        # Rollback the transaction in case of an error
-        connection.rollback()
+        st.success("Thank you for your feedback! We've recorded the error in Google Sheets.")
+    except Exception as e:
         st.error(f"Failed to save error report: {e}")
-    
-    finally:
-        # Close the cursor if it was created
-        if cursor:
-            cursor.close()
 
 
 
@@ -388,17 +343,17 @@ def main():
                 )
                 
                 if st.button("Submit correction"):
-                    if 'current_image' in st.session_state and st.session_state.current_image is not None:
-                        # Call the database-saving function instead of the CSV-saving one
+                    if 'extracted_text' in st.session_state:
+                        # Call the Google Sheets saving function
                         save_error_report(
                             original_text=st.session_state.get('extracted_text', 'No model text available'),
                             corrected_text=corrected_text,
-                            image=st.session_state.current_image,
-                            connection=connection
+                            conn=conn  # Use the Google Sheets connection
                         )
                         st.session_state.show_error_form = False
                     else:
-                        st.error("No image available. Please upload or draw an image first.")
+                        st.error("No extracted text available. Please process an image first.")
+
 
             # Close the connection when the app stops
             #connection.close()
