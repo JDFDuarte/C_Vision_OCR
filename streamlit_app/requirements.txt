@@ -11,4 +11,4 @@ st_gsheets_connection==0.1.0
 streamlit==1.38.0
 streamlit_drawable_canvas==0.9.3
 transformers==4.44.2
-streamlit_gsheets
+streamlit-gsheets
