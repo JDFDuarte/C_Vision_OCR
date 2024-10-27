@@ -66,8 +66,6 @@ st.markdown('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootst
 
 #_______ Paths _______ #
 save_directory = "C:/Users/joana/OneDrive/Desktop/HSLU/3rd_semester/CV/c_vision_ocr/code/trocr-large-stage1-local"
-bg_image = "C:/Users/joana/OneDrive/Desktop/HSLU/3rd_semester/CV/c_vision_ocr/streamlit_app/canvas_back_text.png"
-
 
 #_______ Sidebar Setup _______ #
 display_calendar_in_sidebar()
@@ -265,7 +263,7 @@ def main():
 
 
         elif input_method == "Draw Expression":
-            st.image("canvas_inst.png")
+            st.image("streamlit_app/canvas_inst.png")
             canvas_result = st_canvas(
                 fill_color="rgba(255, 165, 0, 0.3)",
                 stroke_width=3,
