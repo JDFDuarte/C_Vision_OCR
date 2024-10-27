@@ -73,12 +73,6 @@ save_directory = "C:/Users/joana/OneDrive/Desktop/HSLU/3rd_semester/CV/c_vision_
 display_calendar_in_sidebar()
 
 
-#_______ DB Setup _______ #
-conn = st.connection("gsheets", type=GSheetsConnection)
-#df = conn.read()
-#error_report_sheet = conn.read(worksheet="error_report")
-
-
 
 #_______ Functions _______ #
 # cache_dir = HfFolder.cache_home
@@ -93,8 +87,8 @@ model, processor = None, None
 def load_model():
     try:
         with st.spinner("Loading model... This may take a few seconds."):
-            processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
-            model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-small-stage1", ignore_mismatched_sizes=True)
+            processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-stage1")
+            model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-stage1", ignore_mismatched_sizes=True)
         return processor, model
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
