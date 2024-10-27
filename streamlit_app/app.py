@@ -23,7 +23,8 @@ import cv2
 
 import re
 
-
+import warnings
+warnings.filterwarnings('ignore')
 
 
 #_______ Page Setup _______ #
