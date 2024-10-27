@@ -81,9 +81,9 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 
 
 #_______ Functions _______ #
-cache_dir = HfFolder.cache_home
-model_id = "microsoft/trocr-small-stage1"
-shutil.rmtree(os.path.join(cache_dir, "models--" + model_id.replace("/", "--")), ignore_errors=True)
+# cache_dir = HfFolder.cache_home
+# model_id = "microsoft/trocr-small-stage1"
+# shutil.rmtree(os.path.join(cache_dir, "models--" + model_id.replace("/", "--")), ignore_errors=True)
 
 
 model, processor = None, None
