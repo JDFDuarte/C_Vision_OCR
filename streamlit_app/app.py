@@ -87,8 +87,8 @@ model, processor = None, None
 def load_model():
     try:
         with st.spinner("Loading model... This may take a few seconds."):
-            processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-stage1")
-            model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-stage1", ignore_mismatched_sizes=True)
+            processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
+            model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten", ignore_mismatched_sizes=True)
         return processor, model
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
