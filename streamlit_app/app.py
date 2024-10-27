@@ -85,9 +85,9 @@ model, processor = None, None
 @st.cache_data
 # Loads the model without using a locally saved file
 def load_model():
-    with st.spinner("Loading model... This may take a few minutes."):
-        processor = TrOCRProcessor.from_pretrained("microsoft/trocr-large-stage1")
-        model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-large-stage1")
+    with st.spinner("Loading model... This may take a few seconds."):
+        processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-stage1")
+        model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-stage1")
     return processor, model
 
 # Loads the model from a locally saved file
