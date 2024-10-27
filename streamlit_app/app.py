@@ -17,12 +17,14 @@ from sidebar_utils import display_calendar_in_sidebar
 from operator import add, sub, mul, truediv
 
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+from huggingface_hub import try_to_load_from_cache, HfFolder
 
 import pytz
 import cv2
 
 import re
-
+import shutil
+import logging
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -79,15 +81,25 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 
 
 #_______ Functions _______ #
+cache_dir = HfFolder.cache_home
+model_id = "microsoft/trocr-small-stage1"
+shutil.rmtree(os.path.join(cache_dir, "models--" + model_id.replace("/", "--")), ignore_errors=True)
+
+
 model, processor = None, None
 
 @st.cache_data
 # Loads the model without using a locally saved file
 def load_model():
-    with st.spinner("Loading model... This may take a few seconds."):
-        processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
-        model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-small-stage1",    ignore_mismatched_sizes=True)
-    return processor, model
+    try:
+        with st.spinner("Loading model... This may take a few seconds."):
+            processor = TrOCRProcessor.from_pretrained("microsoft/trocr-small-stage1")
+            model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-small-stage1", ignore_mismatched_sizes=True)
+        return processor, model
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
+        logging.error(f"Error loading model: {str(e)}", exc_info=True)
+        return None, None
 
 # Loads the model from a locally saved file
 # def load_model():
